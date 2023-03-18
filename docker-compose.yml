@@ -1,0 +1,47 @@
+version: '3.1'
+
+services:
+  backend:
+    build: /backend
+    expose:
+      - 3306:3306
+      - "5001"
+    ports:
+      - 3306:3306
+      - 5001:5001
+    environment:
+      PORT: 5001
+      HOST: ${MYSQL_HOST}
+      USER: ${MYSQL_USER}
+      PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./backend/:/app
+    env_file:
+      - .env
+    networks:
+      - my-network
+
+  front:
+    build: /frontend
+    # entrypoint: /bin/sh
+    expose:
+      - "5001"
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: http://backend:5001/weather
+    volumes:
+      - ./frontend/:/app
+    env_file:
+      - .env
+    networks:
+      - my-network
+
+volumes:
+  backend-data:
+
+networks:
+  my-network:
+    driver: bridge
